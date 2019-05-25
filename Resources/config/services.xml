@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="opportus_object_mapper.class_canonicalizer" class="Opportus\ObjectMapper\ClassCanonicalizer"></service>
+
+        <service id="opportus_object_mapper.map.route.point.point_factory" class="Opportus\ObjectMapper\Map\Route\Point\PointFactory"></service>
+
+        <service id="opportus_object_mapper.map.route.route_builder" class="Opportus\ObjectMapper\Map\Route\RouteBuilder">
+            <argument type="service" id="opportus_object_mapper.map.route.point.point_factory" />
+        </service>
+
+        <service id="opportus_object_mapper.map.definition.map_definition_registry" class="Opportus\ObjectMapper\Map\Definition\MapDefinitionRegistry"></service>
+
+        <service id="opportus_object_mapper.map.definition.map_definition_builder" class="Opportus\ObjectMapper\Map\Definition\MapDefinitionBuilder">
+            <argument type="service" id="opportus_object_mapper.map.route.route_builder" />
+        </service>
+
+        <service id="opportus_object_mapper.map.map_builder" class="Opportus\ObjectMapper\Map\MapBuilder">
+            <argument type="service" id="opportus_object_mapper.class_canonicalizer" />
+            <argument type="service" id="opportus_object_mapper.map.definition.map_definition_builder" />
+        </service>
+
+        <service id="opportus_object_mapper.object_mapper" class="Opportus\ObjectMapperBundle\ObjectMapper">
+            <argument type="service" id="opportus_object_mapper.class_canonicalizer" />
+            <argument type="service" id="opportus_object_mapper.map.map_builder" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+    </services>
+
+</container>
