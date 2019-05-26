@@ -14,7 +14,6 @@ To do:
 - [Installation](#installation)
     - [Applications that use Symfony Flex](#applications-that-use-symfony-flex)
     - [Applications that do not use Symfony Flex](#applications-that-do-not-use-symfony-flex)
-- [Basic Usage](#basic-usage)
 - [Mapping Objects](#mapping-objects)
     - [Automatic Mapping](#automatic-mapping)
     - [Manual Mapping](#manual-mapping)
@@ -64,45 +63,6 @@ class AppKernel extends Kernel
 
     // ...
 }
-```
-
-## Basic usage
-
-Here's how you can basically use the API:
-
-```php
-class User
-{
-    public $username = 'toto'
-    private $email = 'toto@example.com';
-
-    public function getCountry()
-    {
-        return 'France';
-    }
-}
-
-class Contributor
-{
-    public $username;
-    private $email;
-
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function setCountry($country)
-    {
-        $this->country = $country;
-    }
-}
-
-$contributor = $objectMapper->map(new User(), new Contributor());
-
-echo $contributor->username; // toto
-echo $contributor->getEmail(); // toto@example.com
-echo $contributor->country // France
 ```
 
 ## Mapping Objects
@@ -311,51 +271,11 @@ The method returns a **new** instance of the `MapBuilder`.
 
 ### Static Mapping
 
-This library aims to remain dependence-less and as much simple as possible, therefore it doesn't ship any configuration loading system. However, this library has been designed with the static mapping functionality in mind.
-
-For instance, the [`MapBuilder`](https://github.com/opportus/object-mapper/blob/master/src/Map/MapBuilder.php) uses internally the [`MapDefinitionBuilder`](https://github.com/opportus/object-mapper/blob/master/src/Map/Definition/MapDefinitionBuilder.php). In fact, when building manually a map via `MapBuilder::addRoute()`, you're dynamically building a [`MapDefinition`](https://github.com/opportus/object-mapper/blob/master/src/Map/Definition/MapDefinition.php).
-
-To implement a static mapping system:
-
-1. Validate and load map configurations *by your own way*
-2. Build a `MapDefinition` from the map configuration with the help of the `MapDefinitionBuilder`
-3. Register the `MapDefinition` with the help of the [`MapDefinitionRegistry`](https://github.com/opportus/object-mapper/blob/master/src/Map/Definition/MapDefinitionRegistry.php)
-
-Then the client will be able to get back the registered map definiton corresponding to its static map configuration and finally build a map from it.
-
-**Example**
-
-```php
-$mapConfig; // Say it's an array loaded from a PHP map configuration file...
-
-// Build a map definition from the map configuration...
-$mapDefinitionBuilder = $mapDefinitionBuilder
-    ->prepareMapDefinition()
-    ->setId($mapConfig['id']) // Say 'id' value = '1'...
-;
-
-foreach ($mapConfig['routes'] as $route) {
-    $mapDefinitionBuilder = $mapDefinitionBuilder->addRoute($route['source_point'], $route['target_point']);
-}
-
-$mapDefinition = $mapDefinitionBuilder->buildMapDefinition();
-
-// Register the map definition for later use by the client...
-$mapDefinitionRegistry->registerMapDefinition($mapDefinition); // Throws an exception if a different map definition with same ID is already registered...
-
-// Fetch back the map definition later in the client code...
-$mapDefinition = $mapDefinitionRegistry->getMapDefinition('1'); // Found by its ID...
-
-// Build a map from its definition...
-$map = $mapBuilder->buildMap($mapDefinition);
-
-// Use the map...
-$targets = $objectMapper->map($source, $target, $map);
-```
+Unavailable yet.
 
 ### Target Point Value Assignment Event
 
-In some cases you may need to manipulate or filter the value from the source point before it is assigned to its corresponding target point. This value is available and manipulable via the [`TargetPointValueAssignmentEvent`](https://github.com/opportus/ObjectMapperBundle/blob/master/Event/TargetPointValueAssignmentEvent.php) dispatched on `OpportusObjectMapperEvents::SET_TARGET_POINT_VALUE`.
+In some cases you may need to manipulate or filter the value from the source point before it is assigned to its corresponding target point. This value is available and manipulable via the [`TargetPointValueAssignmentEvent`](https://github.com/opportus/ObjectMapperBundle/blob/master/Event/TargetPointValueAssignmentEvent.php) dispatched on `ObjectMapperEvents::SET_NON_INSTANTIATED_TARGET_POINT_VALUE` and on `ObjectMapperEvents::SET_INSTANTIATED_TARGET_POINT_VALUE`.
 
 **Example**
 
@@ -380,8 +300,7 @@ class ObjectMapperListener
             return;
         }
 
-        // Throws an exception because you have not assigned any value yet...
-        // $value = $event->getTargetPointValueToAssign();
+        $value = $event->getTargetPointValueToAssign(); // Throws an exception because you have not assigned any value yet...
 
         if ($event->hasTargetPointValueToAssign()) {
             $value = $event->getTargetPointValueToAssign();
