@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @author  Clément Cazaud <opportus@gmail.com>
  * @license https://github.com/opportus/ObjectMapperBundle/blob/master/LICENSE MIT
  */
-class ObjectMapper implements ObjectMapperInterface
+final class ObjectMapper implements ObjectMapperInterface
 {
     /**
      * @var Opportus\ObjectMapper\ClassCanonicalizerInterface $classCanonicalizer

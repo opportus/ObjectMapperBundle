@@ -14,7 +14,7 @@ use Symfony\Component\Config\FileLocator;
  * @author  Clément Cazaud <opportus@gmail.com>
  * @license https://github.com/opportus/ObjectMapperBundle/blob/master/LICENSE MIT
  */
-class OpportusObjectMapperExtension extends Extension
+final class OpportusObjectMapperExtension extends Extension
 {
     /**
      * {@inheritdoc}

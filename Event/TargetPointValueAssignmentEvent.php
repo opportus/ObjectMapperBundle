@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\Event;
  * @author  Clément Cazaud <opportus@gmail.com>
  * @license https://github.com/opportus/object-mapper/blob/master/LICENSE MIT
  */
-class TargetPointValueAssignmentEvent extends Event implements TargetPointValueAssignmentEventInterface
+final class TargetPointValueAssignmentEvent extends Event implements TargetPointValueAssignmentEventInterface
 {
     /**
      * @var Opportus\ObjectMapper\Map\Route\RouteInterface $route

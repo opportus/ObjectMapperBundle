@@ -11,5 +11,5 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  * @author  Clément Cazaud <opportus@gmail.com>
  * @license https://github.com/opportus/ObjectMapperBundle/blob/master/LICENSE MIT
  */
-class OpportusObjectMapperBundle extends Bundle
+final class OpportusObjectMapperBundle extends Bundle
 {}
