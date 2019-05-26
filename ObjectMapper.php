@@ -10,7 +10,8 @@ use Opportus\ObjectMapper\Map\Route\RouteCollection;
 use Opportus\ObjectMapper\Map\Route\Point\PropertyPoint;
 use Opportus\ObjectMapper\Map\Route\Point\ParameterPoint;
 use Opportus\ObjectMapper\Exception\InvalidArgumentException;
-use Opportus\ObjectMapperBundle\Event\TargetPointValueAssignmentEvent;
+use Opportus\ObjectMapperBundle\Event\NonInstantiatedTargetPointValueAssignmentEvent;
+use Opportus\ObjectMapperBundle\Event\InstantiatedTargetPointValueAssignmentEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -80,13 +81,14 @@ final class ObjectMapper implements ObjectMapperInterface
         }
 
         $targetClassReflection = new \ReflectionClass($this->classCanonicalizer->getCanonicalFqcn($target));
-        $targetPointValueAssignments = [];
+        $nonInstantiatedTargetPointValueAssignments = [];
 
+        // Instantiates the target...
         if (\is_string($target)) {
-            $targetPointValueAssignments = $this->prepareTargetPointValueAssignments($source, $target, $routeCollection);
+            $nonInstantiatedTargetPointValueAssignments = $this->prepareTargetPointValueAssignments($source, $target, $routeCollection);
 
             $constructorArguments = [];
-            foreach ($targetPointValueAssignments as $targetPointValueAssignment) {
+            foreach ($nonInstantiatedTargetPointValueAssignments as $targetPointValueAssignment) {
                 $targetPoint = $targetPointValueAssignment->getRoute()->getTargetPoint();
                 
                 if (!$targetPoint instanceof ParameterPoint || '__construct' !== $targetPoint->getMethodName()) {
@@ -111,13 +113,13 @@ final class ObjectMapper implements ObjectMapperInterface
             }
         }
 
-        $targetPointValueAssignments = $this->prepareTargetPointValueAssignments($source, $target, $routeCollection, $targetPointValueAssignments);
+        $targetPointValueAssignments = $this->prepareTargetPointValueAssignments($source, $target, $routeCollection, $nonInstantiatedTargetPointValueAssignments);
 
         $methodArguments = [];
         foreach ($targetPointValueAssignments as $targetPointValueAssignment) {
             $targetPoint = $targetPointValueAssignment->getRoute()->getTargetPoint();
             
-            if (!$targetPoint instanceof ParameterPoint || '__construct' === $targetPoint->getMethodName()) {
+            if (!$targetPoint instanceof ParameterPoint) {
                 continue;
             }
 
@@ -167,20 +169,26 @@ final class ObjectMapper implements ObjectMapperInterface
      * @param object $source
      * @param object|string $target
      * @param Opportus\ObjectMapper\Map\Route\RouteCollection $routeCollection
-     * @param Opportus\ObjectMapperBundle\Event\TargetPointValueAssignmentEvent[] $targetPointValueAssignments
-     * @return Opportus\ObjectMapperBundle\Event\TargetPointValueAssignmentEvent[]
+     * @param Opportus\ObjectMapperBundle\Event\NonInstantiatedTargetPointValueAssignmentEvent[] $nonInstantiatedTargetPointValueAssignmentsToMerge
+     * @return Opportus\ObjectMapperBundle\Event\InstantiatedTargetPointValueAssignmentEvent[]|Opportus\ObjectMapperBundle\Event\NonInstantiatedTargetPointValueAssignmentEvent[]
      */
-    private function prepareTargetPointValueAssignments(object $source, $target, RouteCollection $routeCollection, array $targetPointValueAssignmentsToMerge = []): array
+    private function prepareTargetPointValueAssignments(object $source, $target, RouteCollection $routeCollection, array $nonInstantiatedTargetPointValueAssignmentsToMerge = []): array
     {
         $targetPointValueAssignments = [];
         foreach ($routeCollection as $route) {
-            if (!\is_string($target) && $route->getTargetPoint() instanceof ParameterPoint && '__construct' === $route->getTargetPoint()->getMethodName()) {
-                continue;
+            if (\is_object($target)) {
+                if ($route->getTargetPoint() instanceof ParameterPoint && '__construct' === $route->getTargetPoint()->getMethodName()) {
+                    continue;
+                }
+
+                $eventName = ObjectMapperEvents::SET_INSTANTIATED_TARGET_POINT_VALUE;
+                $targetPointValueAssignment = new InstantiatedTargetPointValueAssignmentEvent($route, $source, $target);
+            } else {
+                $eventName = ObjectMapperEvents::SET_NON_INSTANTIATED_TARGET_POINT_VALUE;
+                $targetPointValueAssignment = new NonInstantiatedTargetPointValueAssignmentEvent($route, $source, $target);
             }
 
-            $targetPointValueAssignment = new TargetPointValueAssignmentEvent($route, $source, $target);
-
-            foreach ($targetPointValueAssignmentsToMerge as $targetPointValueAssignmentToMerge) {
+            foreach ($nonInstantiatedTargetPointValueAssignmentsToMerge as $targetPointValueAssignmentToMerge) {
                 if ($targetPointValueAssignmentToMerge->getRoute()->getFqn() === $targetPointValueAssignment->getRoute()->getFqn()) {
                     if ($targetPointValueAssignmentToMerge->hasTargetPointValueAssignmentDisabled()) {
                         $targetPointValueAssignment->disableTargetPointValueAssignment();
@@ -191,8 +199,6 @@ final class ObjectMapper implements ObjectMapperInterface
                     break;
                 }
             }
-
-            $eventName = \is_string($target) ? (ObjectMapperEvents::SET_NON_INSTANTIATED_TARGET_POINT_VALUE) : (ObjectMapperEvents::SET_INSTANTIATED_TARGET_POINT_VALUE);
 
             $this->eventDispatcher->dispatch($eventName, $targetPointValueAssignment);
 
