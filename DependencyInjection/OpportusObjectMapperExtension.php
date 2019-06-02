@@ -2,10 +2,15 @@
 
 namespace Opportus\ObjectMapperBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Opportus\ObjectMapper\Map\Filter\FilterInterface;
+use Opportus\ObjectMapper\Map\MapBuilderInterface;
+use Opportus\ObjectMapper\Map\Route\Point\PointFactoryInterface;
+use Opportus\ObjectMapper\Map\Route\RouteBuilderInterface;
+use Opportus\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * The object mapper extension.
@@ -28,13 +33,11 @@ final class OpportusObjectMapperExtension extends Extension
 
         $loader->load('services.xml');
 
-        $container->setAlias('Opportus\ObjectMapper\ClassCanonicalizerInterface', 'opportus_object_mapper.class_canonicalizer');
-        $container->setAlias('Opportus\ObjectMapper\Map\Route\Point\PointFactoryInterface', 'opportus_object_mapper.map.route.point.point_factory');
-        $container->setAlias('Opportus\ObjectMapper\Map\Route\RouteBuilderInterface', 'opportus_object_mapper.map.route.route_builder');
-        $container->setAlias('Opportus\ObjectMapper\Map\Definition\MapDefinitionRegistryInterface', 'opportus_object_mapper.map.definition.map_definition_registry');
-        $container->setAlias('Opportus\ObjectMapper\Map\Definition\MapDefinitionBuilderInterface', 'opportus_object_mapper.map.definition.map_definition_builder');
-        $container->setAlias('Opportus\ObjectMapper\Map\MapBuilderInterface', 'opportus_object_mapper.map.map_builder');
-        $container->setAlias('Opportus\ObjectMapper\ObjectMapperInterface', 'opportus_object_mapper.object_mapper');
+        $container->setAlias(PointFactoryInterface::class, 'opportus_object_mapper.point_factory');
+        $container->setAlias(RouteBuilderInterface::class, 'opportus_object_mapper.route_builder');
+        $container->setAlias(MapBuilderInterface::class, 'opportus_object_mapper.map_builder');
+        $container->setAlias(ObjectMapperInterface::class, 'opportus_object_mapper.object_mapper');
+
+        $container->registerForAutoconfiguration(FilterInterface::class)->addTag('object_mapper.filter');
     }
 }
-

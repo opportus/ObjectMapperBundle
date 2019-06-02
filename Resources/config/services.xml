@@ -6,30 +6,24 @@
 
     <services>
 
-        <service id="opportus_object_mapper.class_canonicalizer" class="Opportus\ObjectMapper\ClassCanonicalizer"></service>
+        <service id="opportus_object_mapper.point_factory" class="Opportus\ObjectMapper\Map\Route\Point\PointFactory" public="false"></service>
 
-        <service id="opportus_object_mapper.map.route.point.point_factory" class="Opportus\ObjectMapper\Map\Route\Point\PointFactory"></service>
-
-        <service id="opportus_object_mapper.map.route.route_builder" class="Opportus\ObjectMapper\Map\Route\RouteBuilder">
-            <argument type="service" id="opportus_object_mapper.map.route.point.point_factory" />
+        <service id="opportus_object_mapper.route_builder" class="Opportus\ObjectMapper\Map\Route\RouteBuilder" public="false">
+            <argument type="service" id="opportus_object_mapper.point_factory" />
         </service>
 
-        <service id="opportus_object_mapper.map.definition.map_definition_registry" class="Opportus\ObjectMapper\Map\Definition\MapDefinitionRegistry"></service>
-
-        <service id="opportus_object_mapper.map.definition.map_definition_builder" class="Opportus\ObjectMapper\Map\Definition\MapDefinitionBuilder">
-            <argument type="service" id="opportus_object_mapper.map.route.route_builder" />
+        <service id="opportus_object_mapper.map_builder" class="Opportus\ObjectMapper\Map\MapBuilder" public="false">
+            <factory class="Opportus\ObjectMapperBundle\DependencyInjection\MapBuilderFactory" method="createMapBuilder"/>
+            <argument type="service" id="opportus_object_mapper.route_builder" />
+            <argument type="collection" /><!-- Routes. -->
+            <argument type="collection" /><!-- Filters. All services with tag "object_mapper_filter" are stored here by pass. -->
         </service>
 
-        <service id="opportus_object_mapper.map.map_builder" class="Opportus\ObjectMapper\Map\MapBuilder">
-            <argument type="service" id="opportus_object_mapper.class_canonicalizer" />
-            <argument type="service" id="opportus_object_mapper.map.definition.map_definition_builder" />
+        <service id="opportus_object_mapper.object_mapper" class="Opportus\ObjectMapper\ObjectMapper" public="false">
+            <argument type="service" id="opportus_object_mapper.map_builder" />
         </service>
 
-        <service id="opportus_object_mapper.object_mapper" class="Opportus\ObjectMapperBundle\ObjectMapper">
-            <argument type="service" id="opportus_object_mapper.class_canonicalizer" />
-            <argument type="service" id="opportus_object_mapper.map.map_builder" />
-            <argument type="service" id="event_dispatcher" />
-        </service>
+        <service id="opportus_object_mapper_bundle.map_builder_factory" class="Opportus\ObjectMapperBundle\DependencyInjection\MapBuilderFactory" public="false"></service>
 
     </services>
 
