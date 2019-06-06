@@ -3,8 +3,10 @@
 namespace Opportus\ObjectMapperBundle\DependencyInjection;
 
 use Opportus\ObjectMapper\Map\Filter\FilterCollection;
+use Opportus\ObjectMapper\Map\Filter\FilterInterface;
 use Opportus\ObjectMapper\Map\MapBuilder;
 use Opportus\ObjectMapper\Map\MapBuilderInterface;
+use Opportus\ObjectMapper\Map\Route\Route;
 use Opportus\ObjectMapper\Map\Route\RouteBuilderInterface;
 use Opportus\ObjectMapper\Map\Route\RouteCollection;
 
@@ -20,10 +22,10 @@ final class MapBuilderFactory
     /**
      * Creates a map builder.
      * 
-     * @param Opportus\ObjectMapper\Map\Route\RouteBuilderInterface $routeBuilder
-     * @param Opportus\ObjectMapper\Map\Route\Route[] $routes
-     * @param Opportus\ObjectMapper\Map\Filter\FilterInterface[] $routes
-     * @return Opportus\ObjectMapper\Map\MapBuilderInterface[]
+     * @param RouteBuilderInterface $routeBuilder
+     * @param Route[] $routes
+     * @param FilterInterface[] $routes
+     * @return MapBuilderInterface[]
      */
     public function createMapBuilder(RouteBuilderInterface $routeBuilder, array $routes, array $filters): MapBuilderInterface
     {
