@@ -13,7 +13,7 @@
     ],
     "require": {
         "php": "^7.1.0",
-        "opportus/object-mapper": "v1.0.0-alpha.10",
+        "opportus/object-mapper": "v1.0.0-beta.6",
         "symfony/http-kernel": "^4.0",
         "symfony/dependency-injection": "^4.0",
         "symfony/config": "^4.0"

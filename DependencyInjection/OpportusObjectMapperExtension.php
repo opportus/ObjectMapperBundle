@@ -2,11 +2,11 @@
 
 namespace Opportus\ObjectMapperBundle\DependencyInjection;
 
-use Opportus\ObjectMapper\Map\Filter\FilterInterface;
-use Opportus\ObjectMapper\Map\MapBuilderInterface;
-use Opportus\ObjectMapper\Map\Route\Point\PointFactoryInterface;
-use Opportus\ObjectMapper\Map\Route\RouteBuilderInterface;
 use Opportus\ObjectMapper\ObjectMapperInterface;
+use Opportus\ObjectMapper\Map\MapBuilderInterface;
+use Opportus\ObjectMapper\Point\CheckPointInterface;
+use Opportus\ObjectMapper\Point\PointFactoryInterface;
+use Opportus\ObjectMapper\Route\RouteBuilderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -38,6 +38,7 @@ final class OpportusObjectMapperExtension extends Extension
         $container->setAlias(MapBuilderInterface::class, 'opportus_object_mapper.map_builder');
         $container->setAlias(ObjectMapperInterface::class, 'opportus_object_mapper.object_mapper');
 
-        $container->registerForAutoconfiguration(FilterInterface::class)->addTag('object_mapper.filter');
+        $container->registerForAutoconfiguration(PathFinderInterface::class)->addTag('opportus_object_mapper.path_finder');
+        $container->registerForAutoconfiguration(CheckPointInterface::class)->addTag('opportus_object_mapper.check_point');
     }
 }

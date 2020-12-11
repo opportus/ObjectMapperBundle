@@ -2,8 +2,6 @@
 
 namespace Opportus\ObjectMapperBundle;
 
-use Opportus\ObjectMapperBundle\DependencyInjection\Compiler\MappingPredefinitionPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -15,11 +13,4 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 final class OpportusObjectMapperBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
-    {
-        $container->addCompilerPass(new MappingPredefinitionPass());
-    }
 }

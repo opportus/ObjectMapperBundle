@@ -6,24 +6,19 @@
 
     <services>
 
-        <service id="opportus_object_mapper.point_factory" class="Opportus\ObjectMapper\Map\Route\Point\PointFactory" public="false"></service>
+        <service id="opportus_object_mapper.point_factory" class="Opportus\ObjectMapper\Point\PointFactory" public="false"></service>
 
-        <service id="opportus_object_mapper.route_builder" class="Opportus\ObjectMapper\Map\Route\RouteBuilder" public="false">
+        <service id="opportus_object_mapper.route_builder" class="Opportus\ObjectMapper\Route\RouteBuilder" public="false">
             <argument type="service" id="opportus_object_mapper.point_factory" />
         </service>
 
         <service id="opportus_object_mapper.map_builder" class="Opportus\ObjectMapper\Map\MapBuilder" public="false">
-            <factory class="Opportus\ObjectMapperBundle\DependencyInjection\MapBuilderFactory" method="createMapBuilder"/>
             <argument type="service" id="opportus_object_mapper.route_builder" />
-            <argument type="collection" /><!-- Routes. -->
-            <argument type="collection" /><!-- Filters. All services with tag "object_mapper_filter" are stored here by pass. -->
         </service>
 
         <service id="opportus_object_mapper.object_mapper" class="Opportus\ObjectMapper\ObjectMapper" public="false">
             <argument type="service" id="opportus_object_mapper.map_builder" />
         </service>
-
-        <service id="opportus_object_mapper_bundle.map_builder_factory" class="Opportus\ObjectMapperBundle\DependencyInjection\MapBuilderFactory" public="false"></service>
 
     </services>
 
