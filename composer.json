@@ -20,7 +20,5 @@
     },
     "autoload": {
         "psr-4": {"Opportus\\ObjectMapperBundle\\": ""}
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
